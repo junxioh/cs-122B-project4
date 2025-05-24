@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fabflix Movie List</title>
+
+    <!-- public -->
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <!-- include jquery autocomplete JS  -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.devbridge-autocomplete/1.4.11/jquery.autocomplete.min.js"></script>
+    <link rel="stylesheet" href="movie-list.css">
+    <style>
+        /* uniform background and font */
+        body{
+            background:linear-gradient(135deg,#74ebd5,#ACB6E5);
+            min-height:100vh;display:flex;justify-content:center;align-items:flex-start;
+            margin:0;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+        }
+
+        /* card container */
+        .container{
+            background:#fff;width:100%;max-width:1000px;margin:40px auto 60px;
+            padding:30px 40px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.2);
+        }
+
+        h1{color:#333;text-align:center;margin-top:0}
+
+        /* top action button */
+        .user-actions{
+            text-align:right;margin-bottom:15px;
+        }
+        .user-actions a{
+            display:inline-block;margin-left:10px;padding:10px 16px;
+            background:#4CAF50;color:#fff;border-radius:6px;text-decoration:none;
+            font-weight:bold;font-size:14px;transition:background .3s;
+        }
+        .user-actions a:hover{background:#45a049}
+
+        /* subtitles and control */
+        .section h3{margin:25px 0 15px 0;color:#333}
+
+        /* table control */
+        .form-inline label{margin-right:6px;font-weight:bold;color:#555}
+        .form-inline {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .form-inline .search-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+        }
+
+        .form-inline .search-group label {
+            margin-bottom: 5px;
+        }
+
+        .form-inline .title-group {
+            flex: 1 1 100%;
+            max-width: 100%;
+            position: relative;
+        }
+
+        .form-inline .other-group {
+            flex: 1 1 200px;
+        }
+
+        .form-inline input{
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            width: 100%;
+            box-sizing: border-box;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .form-inline input:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+            outline: none;
+        }
+
+        #searchTitle {
+            font-size: 16px;
+            font-weight: 400;
+        }
+        
+        .form-inline .buttons-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .form-inline button{
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #2196F3;
+            color: #fff;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background .3s, transform 0.1s;
+            flex: 1;
+        }
+        .form-inline button:hover{
+            background: #1b80cc;
+            transform: translateY(-1px);
+        }
+        
+        .form-inline button:active {
+            transform: translateY(1px);
+        }
+
+        .form-inline .search-button {
+            background: #4CAF50;
+        }
+        
+        .form-inline .search-button:hover {
+            background: #45a049;
+        }
+
+        /* Browse link */
+        .browse-links a{
+            display:inline-block;margin:4px 6px;text-decoration:none;
+            background:#eee;padding:6px 10px;border-radius:5px;font-size:14px;
+            color:#333;transition:background .3s;
+        }
+        .browse-links a:hover{background:#dcdcdc}
+
+        /* pagnition control */
+        #pagination-controls button{
+            padding:8px 14px;margin:0 6px;border:none;border-radius:6px;
+            background:#FF9800;color:#fff;font-weight:bold;cursor:pointer;
+            transition:background .3s;
+        }
+        #pagination-controls button[disabled]{opacity:.45;cursor:default}
+        #pagination-controls button:not([disabled]):hover{background:#e88900}
+
+        select{
+            padding:7px 10px;border:1px solid #ccc;border-radius:6px;
+            font-size:14px;margin-left:6px;
+        }
+
+        /* movie list table */
+        table{
+            width:100%;border-collapse:collapse;margin-top:10px;
+        }
+        thead{
+            background:#f2f2f2;
+        }
+        th,td{
+            padding:12px 10px;border-bottom:1px solid #e0e0e0;text-align:left;
+            font-size:14px;
+        }
+        th{
+            cursor:pointer;
+        }
+        tr:hover{background:#fafafa}
+
+        .browse-links a.selected{
+            background:#4CAF50;
+            color:#fff;
+            font-weight:bold;
+        }
+
+        /* Autocomplete styles */
+        .autocomplete-suggestions {
+            border: 1px solid #ddd;
+            background: #FFF;
+            overflow: auto;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .autocomplete-suggestion {
+            padding: 10px 15px;
+            white-space: nowrap;
+            overflow: hidden;
+            font-size: 15px;
+            transition: background 0.2s;
+        }
+        .autocomplete-selected {
+            background: #f0f8ff;
+        }
+        .autocomplete-suggestions strong {
+            font-weight: bold;
+            color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Fabflix Movie List</h1>
+
+    <div class="user-actions">
+        <a href="shopping-cart.html">Checkout</a>
+        <a href="logout">Logout</a>
+    </div>
+
+    <!-- Search Section -->
+    <div class="section">
+        <h3>Search Movies</h3>
+        <form id="search-form" class="form-inline">
+            <div class="search-group title-group">
+                <label for="searchTitle">Movie Title:</label>
+                <input type="text" id="searchTitle" name="searchTitle" class="autocomplete-searchbox form-control" placeholder="Enter movie title...">
+            </div>
+            
+            <div class="search-group other-group">
+            <label for="searchYear">Year:</label>
+                <input type="number" id="searchYear" name="searchYear" placeholder="Enter year...">
+            </div>
+
+            <div class="search-group other-group">
+            <label for="searchDirector">Director:</label>
+                <input type="text" id="searchDirector" name="searchDirector" placeholder="Enter director name...">
+            </div>
+
+            <div class="search-group other-group">
+            <label for="searchStar">Star:</label>
+                <input type="text" id="searchStar" name="searchStar" placeholder="Enter star name...">
+            </div>
+
+            <div class="buttons-group">
+            <button type="submit" class="search-button">Search</button>
+                <button type="button" id="clear-search">Reset All</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Browse Section -->
+    <div class="section">
+        <h3>Browse Movies</h3>
+        <div id="genre-links" class="browse-links"></div>
+        <div id="letter-links" class="browse-links" style="margin-top:10px;"></div>
+    </div>
+
+    <!-- Page size & Pagination -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin:20px 0;">
+        <div>
+            <label for="pageSize" style="font-weight:bold;color:#555">Movies per page:</label>
+            <select id="pageSize">
+                <option value="10" selected>10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
+        <div id="pagination-controls">
+            <button id="prev-page">Previous</button>
+            <span id="page-info" style="font-weight:bold;color:#333"></span>
+            <button id="next-page">Next</button>
+        </div>
+    </div>
+
+    <!-- Movie List Table -->
+    <table id="movies-table">
+        <thead>
+        <tr>
+            <th id="title-header">Title</th>
+            <th>Year</th>
+            <th>Director</th>
+            <th>Genres</th>
+            <th>Stars</th>
+            <th id="rating-header">Rating</th>
+            <th>Price</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<script src="movie-list.js"></script>
+</body>
+</html>
