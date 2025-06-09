@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"
+         version="5.0">
+
+    <!-- Welcome File List -->
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+        <welcome-file>login.html</welcome-file>
+    </welcome-file-list>
+
+    <!-- Login Service -->
+    <servlet>
+        <servlet-name>LoginServlet</servlet-name>
+        <servlet-class>login.LoginServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LoginServlet</servlet-name>
+        <url-pattern>/api/login</url-pattern>
+    </servlet-mapping>
+
+    <!-- Movie Service -->
+    <servlet>
+        <servlet-name>MovieServlet</servlet-name>
+        <servlet-class>movie.MovieServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>MovieServlet</servlet-name>
+        <url-pattern>/api/movies/*</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>MovieListServlet</servlet-name>
+        <servlet-class>movie.MovieListServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>MovieListServlet</servlet-name>
+        <url-pattern>/movie-list</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>MovieSearchServlet</servlet-name>
+        <servlet-class>movie.MovieSearchServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>MovieSearchServlet</servlet-name>
+        <url-pattern>/api/movie-search</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>SingleMovieServlet</servlet-name>
+        <servlet-class>movie.SingleMovieServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SingleMovieServlet</servlet-name>
+        <url-pattern>/single-movie</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>ShoppingCartServlet</servlet-name>
+        <servlet-class>movie.ShoppingCartServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ShoppingCartServlet</servlet-name>
+        <url-pattern>/shopping-cart</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>PaymentServlet</servlet-name>
+        <servlet-class>movie.PaymentServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PaymentServlet</servlet-name>
+        <url-pattern>/payment</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>LogoutServlet</servlet-name>
+        <servlet-class>movie.LogoutServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LogoutServlet</servlet-name>
+        <url-pattern>/logout</url-pattern>
+    </servlet-mapping>
+
+    <!-- Authentication Filter -->
+    <filter>
+        <filter-name>LoginFilter</filter-name>
+        <filter-class>common.LoginFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>LoginFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+    </filter-mapping>
+
+    <!-- Resource Mappings -->
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>*.html</url-pattern>
+        <url-pattern>*.js</url-pattern>
+        <url-pattern>*.css</url-pattern>
+        <url-pattern>*.jpg</url-pattern>
+        <url-pattern>*.png</url-pattern>
+        <url-pattern>*.gif</url-pattern>
+    </servlet-mapping>
+
+    <!-- JDBC Resource Reference -->
+    <resource-ref>
+        <description>MySQL DataSource</description>
+        <res-ref-name>jdbc/moviedb</res-ref-name>
+        <res-type>javax.sql.DataSource</res-type>
+        <res-auth>Container</res-auth>
+    </resource-ref>
+</web-app>

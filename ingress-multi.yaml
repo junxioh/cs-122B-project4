@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fabflix-multi-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "fabflix_session"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - path: /fabflix-login(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: fabflix-login-service
+                port:
+                  number: 8080
+          - path: /fabflix-movies(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: fabflix-movies-service
+                port:
+                  number: 8080

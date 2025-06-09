@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fabflix – Error</title>
+    <link rel="stylesheet" href="styles.css">
+
+    <!--  -->
+    <style>
+        body{
+            background:linear-gradient(135deg,#ffdeeb,#b5d5ff);
+            min-height:100vh;display:flex;justify-content:center;align-items:flex-start;
+            margin:0;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+        }
+        .container{
+            background:#fff;width:100%;max-width:800px;margin:60px auto;
+            padding:30px 40px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.2);
+        }
+        h1{color:#c62828;text-align:center;margin-top:0}
+        p{font-size:16px;line-height:1.6;color:#444}
+        .back-link{
+            display:inline-block;margin-top:20px;padding:10px 16px;
+            background:#9E9E9E;color:#fff;border-radius:6px;text-decoration:none;
+            font-weight:bold;transition:background .3s;
+        }
+        .back-link:hover{background:#7e7e7e}
+        .detail{margin-top:12px;color:#d32f2f;font-weight:bold;word-break:break-all}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Something went wrong</h1>
+    <p>We’re sorry, but an error occurred while processing your request.</p>
+
+    <!-- JS  -->
+    <p id="error-detail" class="detail" style="display:none;"></p>
+
+    <a href="movie-list.html" class="back-link">Back to Movie List</a>
+</div>
+
+<script src="error.js"></script>
+</body>
+</html>

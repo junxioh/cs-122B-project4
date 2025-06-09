@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>reCAPTCHA v2 Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background: #dff0d8;
+            color: #3c763d;
+            border: 1px solid #d6e9c6;
+        }
+        .error {
+            background: #f2dede;
+            color: #a94442;
+            border: 1px solid #ebccd1;
+        }
+        pre {
+            background: #fff;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .g-recaptcha {
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>reCAPTCHA v2 Example</h1>
+    
+    <div class="container">
+        <h2>About This Demo</h2>
+        <p>This page demonstrates the integration of Google reCAPTCHA v2. When you complete the verification:</p>
+        <ol>
+            <li>Complete the reCAPTCHA challenge</li>
+            <li>The token will be automatically sent to the server for validation</li>
+            <li>The verification result will be displayed below</li>
+        </ol>
+    </div>
+
+    <div class="container">
+        <h2>Test reCAPTCHA</h2>
+        <form id="verify-form">
+            <div class="g-recaptcha" data-sitekey="YOUR_SITE_KEY" data-callback="onRecaptchaComplete"></div>
+            <div id="result"></div>
+        </form>
+    </div>
+
+    <script>
+        window.onload = async function() {
+            try {
+                // 获取reCAPTCHA site key
+                const response = await fetch('./api/config/recaptcha-key');
+                const siteKey = await response.text();
+                
+                // 更新reCAPTCHA的site key
+                document.querySelector('.g-recaptcha').setAttribute('data-sitekey', siteKey);
+                
+                // 加载reCAPTCHA脚本
+                const script = document.createElement('script');
+                script.src = 'https://www.google.com/recaptcha/api.js';
+                document.head.appendChild(script);
+            } catch (error) {
+                console.error('Error loading reCAPTCHA:', error);
+                document.getElementById('result').innerHTML = 'Error loading reCAPTCHA';
+                document.getElementById('result').className = 'error';
+            }
+        };
+
+        function onRecaptchaComplete(token) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Verifying...';
+            resultDiv.className = '';
+
+            // 发送token到服务器验证
+            fetch('./verify-recaptcha', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `token=${token}`
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    resultDiv.innerHTML = `
+                        <h3>Verification Successful!</h3>
+                        <pre>Verification completed successfully!</pre>`;
+                    resultDiv.className = 'success';
+                } else {
+                    resultDiv.innerHTML = `
+                        <h3>Verification Failed</h3>
+                        <pre>${JSON.stringify(result.error, null, 2)}</pre>`;
+                    resultDiv.className = 'error';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                resultDiv.innerHTML = 'Error during verification';
+                resultDiv.className = 'error';
+            });
+        }
+    </script>
+</body>
+</html> 

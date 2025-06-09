@@ -1,0 +1,139 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fabflix-login
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fabflix-login
+  template:
+    metadata:
+      labels:
+        app: fabflix-login
+    spec:
+      containers:
+      - name: fabflix-login-container
+        image: wanli945/fabflix-login:latest
+        imagePullPolicy: Always
+        ports:
+        - name: http
+          containerPort: 8080
+        env:
+        - name: MYSQL_HOST
+          value: "mysql"
+        - name: MYSQL_PORT
+          value: "3306"
+        - name: MYSQL_DB
+          value: "moviedb"
+        - name: MYSQL_USER
+          value: "root"
+        - name: MYSQL_PASSWORD
+          value: "root"
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fabflix-movies
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fabflix-movies
+  template:
+    metadata:
+      labels:
+        app: fabflix-movies
+    spec:
+      containers:
+      - name: fabflix-movies-container
+        image: wanli945/fabflix-movies:latest
+        imagePullPolicy: Always
+        ports:
+        - name: http
+          containerPort: 8080
+        env:
+        - name: MYSQL_HOST
+          value: "mysql"
+        - name: MYSQL_PORT
+          value: "3306"
+        - name: MYSQL_DB
+          value: "moviedb"
+        - name: MYSQL_USER
+          value: "root"
+        - name: MYSQL_PASSWORD
+          value: "root"
+        - name: KUBERNETES_ENV
+          value: "true"
+        - name: DB_URL
+          value: "jdbc:mysql://mysql-primary.default.svc.cluster.local:3306/moviedb?useSSL=false&allowPublicKeyRetrieval=true"
+        - name: DB_USER
+          value: "root"
+        - name: DB_PASSWORD
+          value: "root"
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fabflix-login-service
+spec:
+  selector:
+    app: fabflix-login
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fabflix-movies-service
+spec:
+  selector:
+    app: fabflix-movies
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fabflix-multi-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /fabflix-login(/|$)(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: fabflix-login-service
+            port:
+              number: 8080
+      - path: /fabflix-movies(/|$)(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: fabflix-movies-service
+            port:
+              number: 8080

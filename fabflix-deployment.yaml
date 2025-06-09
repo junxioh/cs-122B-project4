@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fabflix
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: fabflix
+  template:
+    metadata:
+      labels:
+        app: fabflix
+    spec:
+      containers:
+        - name: fabflix-container
+          image: wanli945/fabflix:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: KUBERNETES_ENV
+              value: "true"
+            - name: DB_URL
+              value: "jdbc:mysql://mysql-primary.default.svc.cluster.local:3306/moviedb?useSSL=false&allowPublicKeyRetrieval=true"
+            - name: DB_USER
+              value: "root"
+            - name: DB_PASSWORD
+              value: "root"
+          resources:
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+      imagePullSecrets:
+        - name: regcred
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fabflix-service
+spec:
+  selector:
+    app: fabflix
+  ports:
+    - name: http
+      port: 8080
+  type: ClusterIP

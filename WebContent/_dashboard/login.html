@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fabflix Employee Login</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-container {
+            background-color: #ffffff;
+            padding: 35px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            position: relative;
+            top: 0;
+            box-sizing: border-box;
+        }
+
+        .login-container h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 28px;
+            font-weight: 600;
+            margin-top: 0;
+            line-height: 1.2;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 6px;
+            color: #555;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 11px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #333;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            height: 42px;
+        }
+
+        .form-control::placeholder {
+            color: #999;
+            font-size: 13px;
+        }
+
+        .form-control:focus {
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.15);
+            outline: none;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 11px 15px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-transform: none;
+            letter-spacing: 0.3px;
+            height: 42px;
+            line-height: 1;
+        }
+
+        .btn-primary:hover {
+            background-color: #45a049;
+        }
+
+        .error-message {
+            color: #dc3545;
+            margin-top: 15px;
+            display: none;
+            font-size: 13px;
+            text-align: center;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #f8d7da;
+            border: 1px solid #f5c2c7;
+            line-height: 1.4;
+        }
+
+        /*.g-recaptcha {
+            display: flex;
+            justify-content: center;
+            margin: 22px 0;
+            min-height: 78px;
+        }
+
+        .g-recaptcha > div {
+            margin: 0 auto;
+            transform: scale(0.95);
+        }*/
+
+        @media (max-width: 576px) {
+            .login-container {
+                margin: 20px;
+                padding: 25px 20px;
+            }
+            .login-container h1 {
+                font-size: 24px;
+                margin-bottom: 22px;
+            }
+            .form-control {
+                padding: 10px 12px;
+                height: 40px;
+            }
+            .btn-primary {
+                padding: 10px 15px;
+                font-size: 14px;
+                height: 40px;
+            }
+            /*.g-recaptcha {
+                margin: 20px 0;
+            }
+            .g-recaptcha > div {
+                transform: scale(0.85);
+            }*/
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>Fabflix Employee Login</h1>
+        <form id="loginForm" onsubmit="return false;">
+            <div class="form-group">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" required placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" required placeholder="Enter your password">
+            </div>
+            <!-- <div id="recaptchaContainer" class="g-recaptcha" data-sitekey=""></div> -->
+            <button type="submit" class="btn-primary" onclick="handleLogin()">Login</button>
+            <div id="errorMessage" class="error-message"></div>
+        </form>
+    </div>
+
+    <script>
+        // 获取应用的上下文路径
+        function getContextPath() {
+            const path = window.location.pathname;
+            const contextPath = path.substring(0, path.indexOf('/_dashboard'));
+            return contextPath || '';  // 如果没有找到，返回空字符串
+        }
+
+        // 页面加载时获取reCAPTCHA站点密钥
+        /*window.onload = async function() {
+            try {
+                console.log('Loading reCAPTCHA configuration...');
+                const contextPath = getContextPath();
+                console.log('Context path:', contextPath);
+                
+                const response = await fetch(contextPath + '/api/config/recaptcha-key');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const siteKey = await response.text();
+                console.log('Received site key:', siteKey);
+                
+                if (!siteKey || siteKey.trim() === '') {
+                    throw new Error('Invalid site key received');
+                }
+                
+                // 更新reCAPTCHA的site key
+                const recaptchaDiv = document.getElementById('recaptchaContainer');
+                if (!recaptchaDiv) {
+                    throw new Error('reCAPTCHA container not found');
+                }
+                recaptchaDiv.setAttribute('data-sitekey', siteKey);
+                console.log('Updated reCAPTCHA div with site key');
+                
+                // 加载reCAPTCHA脚本
+                const script = document.createElement('script');
+                script.src = 'https://www.google.com/recaptcha/api.js';
+                script.async = true;
+                script.defer = true;
+                script.onerror = function() {
+                    console.error('Failed to load reCAPTCHA script');
+                    showError('Failed to load reCAPTCHA script. Please check your internet connection and refresh the page.');
+                };
+                script.onload = function() {
+                    console.log('reCAPTCHA script loaded successfully');
+                    // 重新渲染reCAPTCHA
+                    if (typeof grecaptcha !== 'undefined' && typeof grecaptcha.render === 'function') {
+                        grecaptcha.render('recaptchaContainer', {
+                            'sitekey': siteKey
+                        });
+                    }
+                };
+                document.head.appendChild(script);
+            } catch (error) {
+                console.error('Error loading reCAPTCHA:', error);
+                showError('Error loading reCAPTCHA: ' + error.message + '. Please refresh the page.');
+            }
+        };*/
+
+        function showError(message) {
+            const errorMessageDiv = document.getElementById('errorMessage');
+            errorMessageDiv.textContent = message;
+            errorMessageDiv.style.display = 'block';
+        }
+
+        function handleLogin() {
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value.trim();
+            const errorMessageDiv = document.getElementById("errorMessage");
+            errorMessageDiv.style.display = "none";
+
+            if (!email || !password) {
+                showError("Email and password are required.");
+                return;
+            }
+
+            /*if (typeof grecaptcha === 'undefined') {
+                showError("reCAPTCHA is not loaded. Please refresh the page.");
+                return;
+            }
+
+            const recaptchaResponse = grecaptcha.getResponse();
+            if (!recaptchaResponse) {
+                showError("Please complete the reCAPTCHA verification.");
+                return;
+            }*/
+
+            const contextPath = getContextPath();
+            fetch(contextPath + "/_dashboard/api/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    email,
+                    password
+                    // "g-recaptcha-response": recaptchaResponse
+                })
+            })
+            .then(resp => resp.json())
+            .then(data => {
+                if (data.status === "success") {
+                    const contextPath = getContextPath();
+                    window.location.href = contextPath + "/_dashboard/dashboard.html";
+                } else {
+                    showError(data.message || "Login failed.");
+                    // 重置reCAPTCHA
+                    /*if (typeof grecaptcha !== 'undefined') {
+                        grecaptcha.reset();
+                    }*/
+                }
+            })
+            .catch(err => {
+                console.error("Error:", err);
+                showError("Network error. Please try again later.");
+                // 重置reCAPTCHA
+                /*if (typeof grecaptcha !== 'undefined') {
+                    grecaptcha.reset();
+                }*/
+            });
+        }
+    </script>
+</body>
+</html>
