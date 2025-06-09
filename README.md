@@ -253,7 +253,7 @@ The Fabflix application is split into two microservices:
 
 Both services use JWT for stateless authentication, allowing them to scale independently.
 
-## Performance Testing Results Jmeter
+## Performance Testing Results with Jmeter
 
 Using the `fabflix-test.jmx` script with 5 concurrent users and a single iteration (loop=1), we observed:
 
